@@ -26,7 +26,6 @@ E1221 13:14:52.314628       1 action_handler.go:176] action execution error fail
 E1221 13:14:52.314703       1 turbo_probe.go:201] Error executing action
 ```
 
-
 3. Created ORM CR in `ibm-common-services` namespace
 
 ```yaml
@@ -159,11 +158,12 @@ E1221 14:15:55.770214       1 turbo_probe.go:201] Error executing action
 ```
 
 5. Changed name of ORM CR to singular not plural CRD name
+
 ```yaml
 apiVersion: turbonomic.com/v1alpha1
 kind: OperatorResourceMapping
 metadata:
-  name: grafanas.operator.ibm.com
+  name: grafana.operator.ibm.com
   labels:
     component: cpfs
 spec:
