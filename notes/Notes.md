@@ -269,8 +269,10 @@ status:
 
 - how to resize operators (given their sizes are specified in their CSV file, managed by OLM)?
 - what defined the 'Application' in Turbo?
-
-- in ORM definition: Deployment, ReplicaSet or StatefulSet?
-- in which namespace ORM CR to be created?
-- Operator managed resources control: https://github.com/turbonomic/kubeturbo/pull/441
 - How to check ORM CR got 'registered'?
+
+### Answered
+
+- in ORM definition: Deployment, ReplicaSet or StatefulSet? (answer: whatever is managed by the operator)
+- in which namespace ORM CR to be created? (in workload's namespace)
+- Operator managed resources control: https://github.com/turbonomic/kubeturbo/pull/441
