@@ -33,7 +33,7 @@ E1221 13:14:52.314703       1 turbo_probe.go:201] Error executing action
 apiVersion: turbonomic.com/v1alpha1
 kind: OperatorResourceMapping
 metadata:
-  name: grafana.operator.ibm.com
+  name: grafanas.operator.ibm.com
   labels:
     component: cpfs
 spec:
@@ -155,6 +155,113 @@ E1221 14:15:55.769540       1 workload_controller_resizer.go:168] Failed to resi
 E1221 14:15:55.769696       1 action_handler.go:230] Failed to execute action RIGHT_SIZE on WORKLOAD_CONTROLLER [ibm-monitoring-grafana]: failed after 3 attepmts, last error: operatorResourceSpec not found in operatorResourceSpecMap for operatorCR abdfdf9c-a21a-4ed0-8dc9-13480813438f
 E1221 14:15:55.770074       1 action_handler.go:176] action execution error failed after 3 attepmts, last error: operatorResourceSpec not found in operatorResourceSpecMap for operatorCR abdfdf9c-a21a-4ed0-8dc9-13480813438f
 E1221 14:15:55.770214       1 turbo_probe.go:201] Error executing action
+
+```
+
+5. Changed name of ORM CR to singular not plural CRD name
+```yaml
+apiVersion: turbonomic.com/v1alpha1
+kind: OperatorResourceMapping
+metadata:
+  name: grafanas.operator.ibm.com
+  labels:
+    component: cpfs
+spec:
+  resourceMappings:
+  - srcResourceSpec:
+      kind: Deployment
+      componentNames:
+        - ibm-monitoring-grafana
+    resourceMappingTemplates:
+    - srcPath: .spec.template.spec.containers[?(@.name=="router")].resources
+      destPath: .spec.routerConfig.resources
+    - srcPath: .spec.template.spec.containers[?(@.name=="dashboard-controller")].resources
+      destPath: .spec.dashboardConfig.resources
+    - srcPath: .spec.template.spec.containers[?(@.name=="ds-proxy")].resources
+      destPath: .spec.datasourceConfig.proxyResources.resources
+    - srcPath: .spec.template.spec.containers[?(@.name=="grafana")].resources
+      destPath: .spec.grafanaConfig.resources
+```
+
+6. Success
+
+```log
+I1221 14:36:25.095055       1 remote_mediation_client.go:214] [handleServerMessages][ServerRequestEndpoint] : received message with request type Action.
+I1221 14:36:25.095783       1 action_handler.go:356] Received an action RIGHT_SIZE for entity WORKLOAD_CONTROLLER [ibm-monitoring-grafana]
+I1221 14:36:25.149033       1 workload_controller_resizer.go:165] Begin to resize workload controller ibm-common-services/ibm-monitoring-grafana.
+I1221 14:36:25.161561       1 resize_container_util.go:69] Try to update container router resource limit from map[cpu:{i:{value:50 scale:-3} d:{Dec:<nil>} s:50m Format:DecimalSI} memory:{i:{value:52428800 scale:0} d:{Dec:<nil>} s:50Mi Format:BinarySI}] to map[cpu:{{350 -3} {<nil>} 350m DecimalSI} memory:{{52428800 0} {<nil>} 50Mi BinarySI}]
+I1221 14:36:25.161781       1 resize_container_util.go:69] Try to update container dashboard-controller resource limit from map[cpu:{i:{value:20 scale:-3} d:{Dec:<nil>} s:20m Format:DecimalSI} memory:{i:{value:83886080 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{120 -3} {<nil>} 120m DecimalSI} memory:{{83886080 0} {<nil>}  BinarySI}]
+I1221 14:36:25.162078       1 resize_container_util.go:69] Try to update container ds-proxy resource limit from map[cpu:{i:{value:10 scale:-3} d:{Dec:<nil>} s:10m Format:DecimalSI} memory:{i:{value:268435456 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{10 -3} {<nil>} 10m DecimalSI} memory:{{134217728 0} {<nil>}  BinarySI}]
+I1221 14:36:25.162195       1 resize_container_util.go:69] Try to update container ds-proxy resource limit from map[cpu:{i:{value:10 scale:-3} d:{Dec:<nil>} s:10m Format:DecimalSI} memory:{i:{value:134217728 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{110 -3} {<nil>} 110m DecimalSI} memory:{{134217728 0} {<nil>}  BinarySI}]
+I1221 14:36:25.175635       1 operator_resource_mapping.go:246] Updating CR Grafana/ibm-monitoring for Deployment/ibm-monitoring-grafana in namespace ibm-common-services
+I1221 14:36:25.220391       1 operator_resource_mapping.go:286] Successfully updated CR Grafana/ibm-monitoring '.spec.routerConfig.resources' from map[limits:map[cpu:50m memory:50Mi] requests:map[cpu:20m memory:20Mi]] to map[limits:map[cpu:350m memory:50Mi] requests:map[cpu:20m memory:20Mi]] for Deployment/ibm-monitoring-grafana in namespace ibm-common-services
+I1221 14:36:45.250841       1 resize_container_util.go:69] Try to update container dashboard-controller resource limit from map[cpu:{i:{value:20 scale:-3} d:{Dec:<nil>} s:20m Format:DecimalSI} memory:{i:{value:83886080 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{120 -3} {<nil>} 120m DecimalSI} memory:{{83886080 0} {<nil>}  BinarySI}]
+I1221 14:36:45.250965       1 resize_container_util.go:69] Try to update container ds-proxy resource limit from map[cpu:{i:{value:10 scale:-3} d:{Dec:<nil>} s:10m Format:DecimalSI} memory:{i:{value:268435456 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{10 -3} {<nil>} 10m DecimalSI} memory:{{134217728 0} {<nil>}  BinarySI}]
+I1221 14:36:45.250997       1 resize_container_util.go:69] Try to update container ds-proxy resource limit from map[cpu:{i:{value:10 scale:-3} d:{Dec:<nil>} s:10m Format:DecimalSI} memory:{i:{value:134217728 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{110 -3} {<nil>} 110m DecimalSI} memory:{{134217728 0} {<nil>}  BinarySI}]
+I1221 14:36:45.264854       1 operator_resource_mapping.go:246] Updating CR Grafana/ibm-monitoring for Deployment/ibm-monitoring-grafana in namespace ibm-common-services
+I1221 14:36:45.286641       1 operator_resource_mapping.go:286] Successfully updated CR Grafana/ibm-monitoring '.spec.dashboardConfig.resources' from map[limits:map[cpu:20m memory:80Mi] requests:map[cpu:20m memory:30Mi]] to map[limits:map[cpu:120m memory:80Mi] requests:map[cpu:20m memory:30Mi]] for Deployment/ibm-monitoring-grafana in namespace ibm-common-services
+I1221 14:37:05.325887       1 resize_container_util.go:69] Try to update container ds-proxy resource limit from map[cpu:{i:{value:10 scale:-3} d:{Dec:<nil>} s:10m Format:DecimalSI} memory:{i:{value:268435456 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{10 -3} {<nil>} 10m DecimalSI} memory:{{134217728 0} {<nil>}  BinarySI}]
+I1221 14:37:05.325965       1 resize_container_util.go:69] Try to update container ds-proxy resource limit from map[cpu:{i:{value:10 scale:-3} d:{Dec:<nil>} s:10m Format:DecimalSI} memory:{i:{value:134217728 scale:0} d:{Dec:<nil>} s: Format:BinarySI}] to map[cpu:{{110 -3} {<nil>} 110m DecimalSI} memory:{{134217728 0} {<nil>}  BinarySI}]
+I1221 14:37:05.339899       1 operator_resource_mapping.go:246] Updating CR Grafana/ibm-monitoring for Deployment/ibm-monitoring-grafana in namespace ibm-common-services
+I1221 14:37:05.390794       1 operator_resource_mapping.go:286] Successfully updated CR Grafana/ibm-monitoring '.spec.datasourceConfig.proxyResources.resources' from <nil> to map[limits:map[cpu:110m memory:128Mi] requests:map[cpu:5m memory:16Mi]] for Deployment/ibm-monitoring-grafana in namespace ibm-common-services
+I1221 14:37:05.391914       1 k8s_controller_updater.go:147] Successfully updated Deployment ibm-common-services/ibm-monitoring-grafana
+
+```
+
+7. Updated Grafana CR
+
+```yaml
+apiVersion: operator.ibm.com/v1alpha1
+kind: Grafana
+metadata:
+  selfLink: >-
+    /apis/operator.ibm.com/v1alpha1/namespaces/ibm-common-services/grafanas/ibm-monitoring
+  resourceVersion: '130312751'
+  name: ibm-monitoring
+  uid: abdfdf9c-a21a-4ed0-8dc9-13480813438f
+  creationTimestamp: '2021-07-12T20:52:57Z'
+  generation: 4
+  namespace: ibm-common-services
+  labels:
+    operator.ibm.com/opreq-control: 'true'
+spec:
+  dashboardConfig:
+    ipVersion: IPv4
+    resources:
+      limits:
+        cpu: 120m
+        memory: 80Mi
+      requests:
+        cpu: 20m
+        memory: 30Mi
+  datasourceConfig:
+    proxyResources: {}
+  grafanaConfig:
+    resources:
+      limits:
+        cpu: 150m
+        memory: 120Mi
+      requests:
+        cpu: 20m
+        memory: 40Mi
+  routerConfig:
+    resources:
+      limits:
+        cpu: 350m
+        memory: 50Mi
+      requests:
+        cpu: 20m
+        memory: 20Mi
+  service:
+    ports:
+      - name: ibm-monitoring-grafana
+        port: 3000
+        protocol: TCP
+  tlsClientSecretName: ibm-monitoring-certs
+  tlsSecretName: ibm-monitoring-certs
+status:
+  message: success
+  phase: reconciling
 
 ```
 
