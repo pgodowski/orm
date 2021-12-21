@@ -33,7 +33,7 @@ E1221 13:14:52.314703       1 turbo_probe.go:201] Error executing action
 apiVersion: turbonomic.com/v1alpha1
 kind: OperatorResourceMapping
 metadata:
-  name: grafanas.operator.ibm.com
+  name: grafana.operator.ibm.com
   labels:
     component: cpfs
 spec:
@@ -54,6 +54,86 @@ spec:
 ```
 
 4. Still error
+
+Deployment
+
+```yaml
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '13'
+  selfLink: >-
+    /apis/apps/v1/namespaces/ibm-common-services/deployments/ibm-monitoring-grafana
+  resourceVersion: '120745803'
+  name: ibm-monitoring-grafana
+  uid: 76bcfd9e-0a41-46de-b1a6-5e0a15468e5f
+  creationTimestamp: '2021-07-12T20:54:54Z'
+  generation: 13
+  namespace: ibm-common-services
+  ownerReferences:
+    - apiVersion: operator.ibm.com/v1alpha1
+      kind: Grafana
+      name: ibm-monitoring
+      uid: abdfdf9c-a21a-4ed0-8dc9-13480813438f
+      controller: true
+      blockOwnerDeletion: true
+```
+
+Grafana CR
+
+```yaml
+apiVersion: operator.ibm.com/v1alpha1
+kind: Grafana
+metadata:
+  selfLink: >-
+    /apis/operator.ibm.com/v1alpha1/namespaces/ibm-common-services/grafanas/ibm-monitoring
+  resourceVersion: '120743238'
+  name: ibm-monitoring
+  uid: abdfdf9c-a21a-4ed0-8dc9-13480813438f
+  creationTimestamp: '2021-07-12T20:52:57Z'
+  generation: 1
+  namespace: ibm-common-services
+  labels:
+    operator.ibm.com/opreq-control: 'true'
+spec:
+  dashboardConfig:
+    ipVersion: IPv4
+    resources:
+      limits:
+        cpu: 20m
+        memory: 80Mi
+      requests:
+        cpu: 20m
+        memory: 30Mi
+  grafanaConfig:
+    resources:
+      limits:
+        cpu: 150m
+        memory: 120Mi
+      requests:
+        cpu: 20m
+        memory: 40Mi
+  routerConfig:
+    resources:
+      limits:
+        cpu: 50m
+        memory: 50Mi
+      requests:
+        cpu: 20m
+        memory: 20Mi
+  service:
+    ports:
+      - name: ibm-monitoring-grafana
+        port: 3000
+        protocol: TCP
+  tlsClientSecretName: ibm-monitoring-certs
+  tlsSecretName: ibm-monitoring-certs
+status:
+  message: success
+  phase: reconciling
+```
+
 
 ```log
 I1221 14:15:15.661086       1 action_handler.go:356] Received an action RIGHT_SIZE for entity WORKLOAD_CONTROLLER [ibm-monitoring-grafana]
