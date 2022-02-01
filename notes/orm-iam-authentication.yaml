@@ -1,7 +1,7 @@
 apiVersion: turbonomic.com/v1alpha1
 kind: OperatorResourceMapping
 metadata:
-  name: authentication.operator.ibm.com
+  name: authentications.operator.ibm.com
   labels:
     component: cpfs
 spec:

@@ -1,7 +1,7 @@
 apiVersion: turbonomic.com/v1alpha1
 kind: OperatorResourceMapping
 metadata:
-  name: pap.operator.ibm.com
+  name: paps.operator.ibm.com
   labels:
     component: cpfs
 spec:

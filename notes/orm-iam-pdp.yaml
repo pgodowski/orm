@@ -1,7 +1,7 @@
 apiVersion: turbonomic.com/v1alpha1
 kind: OperatorResourceMapping
 metadata:
-  name: pap.operator.ibm.com
+  name: policydecisions.operator.ibm.com
   labels:
     component: cpfs
 spec:
@@ -9,7 +9,7 @@ spec:
   - srcResourceSpec:
       kind: Deployment
       componentNames:
-        - auth-pap
+        - auth-pdp
     resourceMappingTemplates:
     - srcPath: .spec.template.spec.containers[?(@.name=="icp-audit-service")].resources
       destPath: .spec.auditService.resources
